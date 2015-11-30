@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NoteMaps</title>
+  <%= stylesheet_link_tag "application", media: "all" %>
+  <%= stylesheet_link_tag "navbar-static-top", media: "all" %>
+  <%= stylesheet_link_tag "style", media: "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+
+</head>
+<body>
+	<div class="container" id="aaa">
+		<div id="main">
+			<div id="map" style="float: left;">
+				<p>マップ</p>
+			</div>
+			<div id="sidebar" style="float: right;">
+				<p>サイドバー</p>
+			</div>
+		</div>
+	</div>
+<!-- <%= yield %> -->
+<%= javascript_include_tag "bootstrap.min" %>
+<%= javascript_include_tag "http://d3js.org/d3.v3.min.js" %>
+<%= javascript_include_tag "http://maps.googleapis.com/maps/api/js?sensor=true" %>
+<%= javascript_include_tag "radarchart-googlemaps.js" %>
+</body>
+</html>
