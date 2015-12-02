@@ -11,6 +11,7 @@
  * file per style scope.
  *
  *= require_self
+ *= require 0_bootstrap.min
+ *= require 1_style
  *= require navbar-static-top
- *= require style
  */

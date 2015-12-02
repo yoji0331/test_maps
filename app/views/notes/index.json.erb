@@ -1,0 +1,6 @@
+<% items = [] %>
+<% @notes.each do |note| %>
+<% items.push({ name: note.name, lat: note.lat,lng: note.lng, date: note.date, 
+	"自然のすがた" =>  {"水の流れはゆたかですか？" => note.mi18 , "岸のようすは自然らしいですか？" => note.mi19 } }) %>
+<% end %>
+<%= raw items.to_json %>

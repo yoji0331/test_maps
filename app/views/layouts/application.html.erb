@@ -3,13 +3,41 @@
 <head>
   <title>NoteMaps</title>
   <%= stylesheet_link_tag "application", media: "all" %>
-  <%= stylesheet_link_tag "navbar-static-top", media: "all" %>
-  <%= stylesheet_link_tag "style", media: "all" %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
-
+  <meta name='viewport' content="width=divice-width, initial-scale=1">
 </head>
 <body>
+
+	<!-- Static navbar -->
+	<nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">水しるべ調査</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">自然のすがた</a></li>
+              <li><a href="#">ゆたかな生き物</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
 	<div class="container" id="aaa">
 		<div id="main">
 			<div id="map" style="float: left;">

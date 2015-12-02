@@ -11,15 +11,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151114112303) do
+ActiveRecord::Schema.define(version: 20151202185813) do
 
   create_table "notes", force: :cascade do |t|
     t.string   "name"
-    t.string   "note_id"
     t.float    "lat"
     t.float    "lng"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float    "mi01"
+    t.float    "mi02"
+    t.float    "mi03"
+    t.float    "mi04"
+    t.float    "mi05"
+    t.float    "mi06"
+    t.float    "mi07"
+    t.float    "mi08"
+    t.float    "mi09"
+    t.float    "mi10"
+    t.float    "mi11"
+    t.float    "mi12"
+    t.float    "mi13"
+    t.float    "mi14"
+    t.float    "mi15"
+    t.float    "mi16"
+    t.float    "mi17"
+    t.float    "mi18"
+    t.float    "mi19"
+    t.float    "mi20"
+    t.float    "mi21"
+    t.float    "mi22"
+    t.float    "mi23"
+    t.float    "mi24"
+    t.float    "mi25"
+    t.date     "date"
   end
 
 end
