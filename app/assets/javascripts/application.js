@@ -14,5 +14,4 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require bootstrap.min
-//= require radarchart-googlemaps
 //= require resize

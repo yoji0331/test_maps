@@ -23,7 +23,7 @@ RADAR_CHART.radarChart = function (index, scores) {
 
     w = 200;
     h = 200;
-    padding = 20;
+    padding = 30;
 
     svg = d3.select('#infodiv' + index)
         .append('svg')
@@ -34,7 +34,8 @@ RADAR_CHART.radarChart = function (index, scores) {
 
     paramCount = dataset[0].length;
 
-    max = d3.max(d3.merge(dataset));
+    // max = d3.max(d3.merge(dataset));
+    max = 3;
 
     rScale = d3.scale.linear()
         .domain([0, max])
@@ -101,7 +102,7 @@ RADAR_CHART.radarChart = function (index, scores) {
         .enter()
         .append('text')
         .text(function (i) {
-            return i + 1;
+            return i - 1;
         })
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
@@ -116,7 +117,6 @@ RADAR_CHART.radarChart = function (index, scores) {
 
 RADAR_CHART.createMarker = function (spot, map) {
     'use strict';
-
     var marker = new google.maps.Marker({
         position: new google.maps.LatLng(spot.lat, spot.lng),
         map: map
@@ -160,16 +160,19 @@ $(document).ready(function () {
         map,
         markers = [];
 
-    center = new google.maps.LatLng(40.7845, 140.778);
+    center = new google.maps.LatLng(40.691153, 141.089492);
 
     options = {
-        zoom: 15,
+        zoom: 13,
         center: center,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
     map = new google.maps.Map($('#map').get(0), options);
 
+
+    // サンプルデータ
+    /*
     $.getJSON("data.json", function (spots) {
 
         var i;
@@ -179,4 +182,60 @@ $(document).ready(function () {
             RADAR_CHART.attachInfoWindow(markers[i], spots[i].name, blankScores, i);
         }
     });
+    */
+
+    $.getJSON("notes.json", function (spots) {
+        
+        /*
+        // for(.. in ,,) 
+        // dataが[object object]となり
+        // 値が取得できない 
+        var i;
+        var isObject = function(o) {
+            return (o instanceof Object && !(o instanceof Array)) ? true : false;
+        };
+        for(i=0; i<spots.length;i++){
+            var obj = spots[i];
+            console.log(obj);
+            var key;
+            for(key in obj){
+                console.log("---");
+                console.log("key:" + key);
+                if (!isObject(obj[key])){
+                    console.log("data:" + obj[key]);
+                } else {
+                    var tmp;
+                    for(tmp in obj[key]){
+                        console.log("tmp:" + tmp);
+                        console.log(obj[key][tmp]);
+                    }
+                }
+
+            }
+        }*/
+        
+
+        // 連想配列のキーを配列に入れる
+        // 配列は作成できたが
+        // マーカーが作成できない
+        var i;
+        var dataAll;
+        for (i = 0; i < spots.length; i += 1) {
+            dataAll = [];
+            dataAll.push(spots[i]["自然のすがた"]["水の流れはゆたかですか？"]);
+            dataAll.push(spots[i]["自然のすがた"]["岸のようすは自然らしいですか？"]);
+            dataAll.push(spots[i]["自然のすがた"]["魚が川をさかのぼれるだろうか？"]);
+           // console.log(dataAll);
+            blankScores = dataAll;
+            markers[i] = RADAR_CHART.createMarker(spots[i], map);
+            RADAR_CHART.attachInfoWindow(markers[i], spots[i]["name"], blankScores, i);
+            // console.log(spots[i]["name"]);
+        }
+
+    });
+});
+
+$("#a1").on('click', function(e) {
+    alert("a1-alert");
+    e.preventDefault();
 });
