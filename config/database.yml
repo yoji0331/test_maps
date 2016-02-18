@@ -22,8 +22,8 @@ test:
 
 production:
   adapter: postgresql
-  encording: unicode
-  database:
+  encording: utf8
+  database: <%= ENV ['DB_NAME'] %>
   pool: 5
   username: smhsc251@yahoo.co.jp
   password: yoji0331
