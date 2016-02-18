@@ -3,3 +3,11 @@
 .navbar-static-top {
   margin-bottom: 19px;
 }
+
+
+#path{
+	z-index: 1;
+}
+#path.axis{
+	z-index: 0;
+}

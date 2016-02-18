@@ -36,14 +36,23 @@ RADAR_CHART.radarChart = function (index, scores) {
         .attr('width', w)
         .attr('height', h);
 
-    console.log(scores.length);
     dataset = [scores];
 
     var k, axis =[], dataAxis;
-    for (k=0;k < scores.length;k++){
-        axis.push(0);
-        axis.push(max);        
+    if(scores.length % 2 == 0){
+        for (k=0;k < scores.length;k++){
+            axis.push(0);    
+            axis.push(3);    
+            axis.push(0); 
+        }   
+    } else {
+        for (k=0;k < scores.length;k++){
+            axis.push(0);    
+            axis.push(3);    
+        }
     }
+    
+
     dataAxis = [axis];
     
 
@@ -91,6 +100,10 @@ RADAR_CHART.radarChart = function (index, scores) {
         })
         .interpolate('linear');
 
+    
+
+
+
     svg.selectAll('path')
         .data(dataset)
         .enter()
@@ -107,8 +120,8 @@ RADAR_CHART.radarChart = function (index, scores) {
     svg.selectAll('path.axis')
         .data(dataAxis)
         .enter()
-        .append('path.axis')
-        .attr('d', function (d, i) {
+        .append('path')
+        .attr('d', function (d,i) {
             return line(d) + "z";
         })
         .attr("stroke", "black")
@@ -170,10 +183,7 @@ RADAR_CHART.attachInfoWindow = function (marker, name, blankScores, index) {
         google.maps.event.addListener(infoWindow, 'domready', function () {
                 RADAR_CHART.radarChart(index, blankScores);
             });
-    });
-    console.log(blankScores.length);
-    
-    
+    });  
 };
 
 
