@@ -5,8 +5,7 @@ gem 'nokogiri','1.6.0'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.0'
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3', :group => [:development,:test]
-gem 'pg', :group => [:production]
+gem 'sqlite3'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -14,7 +13,7 @@ gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.1.0'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-gem 'therubyracer', platforms: :ruby
+# gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails','4.0.5'
@@ -28,7 +27,7 @@ gem 'jbuilder', '~> 2.0'
 # less(CSS)対応
 gem 'less-rails'
 # JavaScriptのエンジンであるv8をRubyから使えるようにする
-#gem 'therubyracer'
+gem 'therubyracer'
 # JavaScriptコードを実行するためのエンジン
 gem 'execjs'
 # JavaScriptフレームワーク

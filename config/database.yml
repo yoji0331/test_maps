@@ -21,9 +21,5 @@ test:
   database: db/test.sqlite3
 
 production:
-  adapter: postgresql
-  encording: utf8
-  database: <%= ENV ['DB_NAME'] %>
-  pool: 5
-  username: smhsc251@yahoo.co.jp
-  password: yoji0331
+  <<: *default
+  database: db/production.sqlite3

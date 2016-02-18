@@ -8,7 +8,6 @@ var formatData = [];
 for(var i=0;i<4;i++){
     formatData[i] = new Array(6);
 }
-    // cnsole.log(formatData);
 
 RADAR_CHART.radarChart = function (index, scores) {
     'use strict';
@@ -61,7 +60,6 @@ RADAR_CHART.radarChart = function (index, scores) {
 
     paramCount = dataset[0].length;
 
-    // max = d3.max(d3.merge(dataset));
     max = 3;
 
     rScale = d3.scale.linear()
@@ -100,10 +98,6 @@ RADAR_CHART.radarChart = function (index, scores) {
         })
         .interpolate('linear');
 
-    
-
-
-
     svg.selectAll('path')
         .data(dataset)
         .enter()
@@ -125,11 +119,11 @@ RADAR_CHART.radarChart = function (index, scores) {
             return line(d) + "z";
         })
         .attr("stroke", "black")
-        .attr("stroke-width", 2)
+        .attr("stroke-width", "2")
         .attr('fill', 'none');
 
 
-    /*svg.selectAll("path.grid")
+    svg.selectAll("path.grid")
         .data(grid)
         .enter()
         .append("path")
@@ -138,7 +132,7 @@ RADAR_CHART.radarChart = function (index, scores) {
         })
         .attr("stroke", "black")
         .attr("stroke-dasharray", "2")
-        .attr('fill', 'none');*/
+        .attr('fill', 'none');
 
      svg.selectAll("text")
      .data(label)
@@ -176,7 +170,6 @@ RADAR_CHART.attachInfoWindow = function (marker, name, blankScores, index) {
             infoWindow.open(marker.getMap(), marker);
             google.maps.event.addListener(infoWindow,'closeclick',function(){
                 infoWindow = null;
-                // console.log(infoWindow);
             });
         }
 
@@ -207,79 +200,32 @@ $(document).ready(function () {
 
     map = new google.maps.Map($('#map').get(0), options);
 
-
-    // サンプルデータ
-    /*
-    $.getJSON("data.json", function (spots) {
-
-        var i;
-        for (i = 0; i < spots.length; i += 1) {
-            blankScores = spots[i].scores;
-            markers[i] = RADAR_CHART.createMarker(spots[i], map);
-            RADAR_CHART.attachInfoWindow(markers[i], spots[i].name, blankScores, i);
-        }
-    });
-    */
-
     $.getJSON("notes.json", function (spots) {
         
         
-        // for(.. in ,,) 
-        // dataが[object object]となり
-        // 値が取得できない 
         var i;
         var isObject = function(o) {
             return (o instanceof Object && !(o instanceof Array)) ? true : false;
         };
         for(i=0; i<spots.length;i++){
             var obj = spots[i];
-            // console.log(obj);
             var key01;
             var dataArray;
             var j;
             j=0;
             for(key01 in obj){
- // console.log("---");
-                 // console.log("key01:" + key01);
                 if (!isObject(obj[key01])){
-                   // console.log("data:" + obj[key01]);
                 } else {
                     var key02;
                     dataArray = [];
                     for( key02 in obj[key01]){
-                        // console.log("key02:" + key02);
-                     // console.log(obj[key01][key02]);
                         dataArray.push(obj[key01][key02]);
                     }
-                   // console.log("i:" + i + ",j:" + j);
-                   // console.log(dataArray);
                     formatData[i][j] = dataArray;
-                     // console.log("aaa"+formatData[0][j]);
                     j++;
                 }
             }
         }
-        
-
-        // 連想配列のキーを配列に入れる
-        // 配列は作成できたが
-        // マーカーが作成できない
-        /*
-        var i;
-        var dataAll;
-        for (i = 0; i < spots.length; i += 1) {
-            dataAll = [];
-            dataAll.push(spots[i]["自然のすがた"]["水の流れはゆたかですか？"]);
-            dataAll.push(spots[i]["自然のすがた"]["岸のようすは自然らしいですか？"]);
-            dataAll.push(spots[i]["自然のすがた"]["魚が川をさかのぼれるだろうか？"]);
-            // console.log(dataAll);
-            blankScores = dataAll;
-            markers[i] = RADAR_CHART.createMarker(spots[i], map);
-            RADAR_CHART.attachInfoWindow(markers[i], spots[i]["name"], blankScores, i);
-            // console.log(spots[i]["name"]);
-        }
-        */
-
     });
 });
 
