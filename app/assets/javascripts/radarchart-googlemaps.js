@@ -190,7 +190,7 @@ $(document).ready(function () {
         markers = [];
 
 
-    center = new google.maps.LatLng(40.691153, 141.089492);
+    center = new google.maps.LatLng(35.5614174, 139.6928321);
 
     options = {
         zoom: 13,
@@ -235,7 +235,7 @@ $(document).ready(function () {
 $("#a0").on('click', function(e) {
     var blankScores =[];
     markers =[];
-    center = new google.maps.LatLng(40.691153, 141.089492);
+    center = new google.maps.LatLng(35.5614174, 139.6928321);
 
     options = {
         zoom: 13,
@@ -262,7 +262,7 @@ $("#a0").on('click', function(e) {
 $("#a1").on('click', function(e) {
     var blankScores =[];
     markers =[];
-    center = new google.maps.LatLng(40.691153, 141.089492);
+    center = new google.maps.LatLng(35.5614174, 139.6928321);
 
     options = {
         zoom: 13,
@@ -289,7 +289,7 @@ $("#a1").on('click', function(e) {
 $("#a2").on('click', function(e) {
     var blankScores =[];
     markers =[];
-    center = new google.maps.LatLng(40.691153, 141.089492);
+    center = new google.maps.LatLng(35.5614174, 139.6928321);
 
     options = {
         zoom: 13,
@@ -316,7 +316,7 @@ $("#a2").on('click', function(e) {
 $("#a3").on('click', function(e) {
     var blankScores =[];
     markers =[];
-    center = new google.maps.LatLng(40.691153, 141.089492);
+    center = new google.maps.LatLng(35.5614174, 139.6928321);
 
     options = {
         zoom: 13,
@@ -343,7 +343,7 @@ $("#a3").on('click', function(e) {
 $("#a4").on('click', function(e) {
     var blankScores =[];
     markers =[];
-    center = new google.maps.LatLng(40.691153, 141.089492);
+    center = new google.maps.LatLng(35.5614174, 139.6928321);
 
     options = {
         zoom: 13,
@@ -370,7 +370,7 @@ $("#a4").on('click', function(e) {
 $("#a5").on('click', function(e) {
     var blankScores =[];
     markers =[];
-    center = new google.maps.LatLng(40.691153, 141.089492);
+    center = new google.maps.LatLng(35.5614174, 139.6928321);
 
     options = {
         zoom: 13,

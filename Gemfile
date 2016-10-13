@@ -27,7 +27,7 @@ gem 'jbuilder', '~> 2.0'
 # less(CSS)対応
 gem 'less-rails'
 # JavaScriptのエンジンであるv8をRubyから使えるようにする
-gem 'therubyracer'
+ gem 'therubyracer'
 # JavaScriptコードを実行するためのエンジン
 gem 'execjs'
 # JavaScriptフレームワーク
