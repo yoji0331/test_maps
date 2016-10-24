@@ -161,6 +161,7 @@ RADAR_CHART.attachInfoWindow = function (marker, name, blankScores, index) {
 
     var infoWindow = null;
 
+    /*
 
     google.maps.event.addListener(marker, 'click', function () {
         if(infoWindow === null){
@@ -176,7 +177,23 @@ RADAR_CHART.attachInfoWindow = function (marker, name, blankScores, index) {
         google.maps.event.addListener(infoWindow, 'domready', function () {
                 RADAR_CHART.radarChart(index, blankScores);
             });
-    });  
+    });
+    */
+
+    if(infoWindow === null){
+        infoWindow = new google.maps.InfoWindow({
+            content:　name + '<div id="infodiv' + index + '"></div>'
+        });
+        infoWindow.open(marker.getMap(), marker);
+        google.maps.event.addListener(infoWindow,'closeclick',function(){
+            infoWindow = null;
+        });
+    }
+
+    google.maps.event.addListener(infoWindow, 'domready', function () {
+            RADAR_CHART.radarChart(index, blankScores);
+    });
+
 };
 
 
