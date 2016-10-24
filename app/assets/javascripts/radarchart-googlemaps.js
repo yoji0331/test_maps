@@ -160,10 +160,7 @@ RADAR_CHART.attachInfoWindow = function (marker, name, blankScores, index) {
     'use strict';
 
     var infoWindow = null;
-
-    /*
-
-    google.maps.event.addListener(marker, 'click', function () {
+    function attachInfoWindow(){
         if(infoWindow === null){
             infoWindow = new google.maps.InfoWindow({
                 content:　name + '<div id="infodiv' + index + '"></div>'
@@ -173,26 +170,17 @@ RADAR_CHART.attachInfoWindow = function (marker, name, blankScores, index) {
                 infoWindow = null;
             });
         }
-
         google.maps.event.addListener(infoWindow, 'domready', function () {
                 RADAR_CHART.radarChart(index, blankScores);
-            });
-    });
-    */
-
-    if(infoWindow === null){
-        infoWindow = new google.maps.InfoWindow({
-            content:　name + '<div id="infodiv' + index + '"></div>'
-        });
-        infoWindow.open(marker.getMap(), marker);
-        google.maps.event.addListener(infoWindow,'closeclick',function(){
-            infoWindow = null;
         });
     }
 
-    google.maps.event.addListener(infoWindow, 'domready', function () {
-            RADAR_CHART.radarChart(index, blankScores);
+    attachInfoWindow();
+
+    google.maps.event.addListener(marker, 'click', function () {
+        attachInfoWindow();
     });
+    
 
 };
 
@@ -218,8 +206,6 @@ $(document).ready(function () {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function (spots) {
-        
-        
         var i;
         var isObject = function(o) {
             return (o instanceof Object && !(o instanceof Array)) ? true : false;
