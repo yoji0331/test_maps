@@ -399,18 +399,10 @@ $("#a5").on('click', function(e) {
 /* 同地点を判別する関数 */
 function CheckSamePlace(spots){
     for(var i=0;i<spots.length;i++){
-        for(var j=0;j<spots.length;j++){
-            var flag = false;
-            if(i == j){
-                flag = true;
-            }
-            else if(flag == false){
-                if(spots[i].lat == spots[j].lat && spots[i].lng == spots[j].lng){
-                    console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
-                    console.log('i='+i,'j='+j);
-                }
-                else {
-                }
+        for(var j=spots.length-1;j>i;j--){
+            if(spots[i].lat == spots[j].lat && spots[i].lng == spots[j].lng){
+                console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
+                console.log('i='+i,'j='+j);
             }
         }
     }
