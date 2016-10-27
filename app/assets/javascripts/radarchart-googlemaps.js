@@ -9,6 +9,8 @@ for(var i=0;i<4;i++){
     formatData[i] = new Array(6);
 }
 
+
+
 RADAR_CHART.radarChart = function (index, scores) {
     'use strict';
 
@@ -180,8 +182,6 @@ RADAR_CHART.attachInfoWindow = function (marker, name, blankScores, index) {
     google.maps.event.addListener(marker, 'click', function () {
         attachInfoWindow();
     });
-    
-
 };
 
 
@@ -384,6 +384,8 @@ $("#a5").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
+        /* 同地点を判別する*/
+        CheckSamePlace(spots);
         for (var i=0;i<spots.length; i++){
             blankScores = formatData[i][5];
             markers[i] = RADAR_CHART.createMarker(spots[i], map);
@@ -393,3 +395,23 @@ $("#a5").on('click', function(e) {
     document.getElementById('content').innerHTML = '<p>項目: 総合平均</p><p>1:ゆたかな生き物</p><p>2:地域とのつながり</p><p>3:快適な水辺</p><p>4:水のきれいさ</p><p>5:自然のすがた</p>';
     e.preventDefault();
 });
+
+/* 同地点を判別する関数 */
+function CheckSamePlace(spots){
+    for(var i=0;i<spots.length;i++){
+        for(var j=0;j<spots.length;j++){
+            var flag = false;
+            if(i == j){
+                flag = true;
+            }
+            else if(flag == false){
+                if(spots[i].lat == spots[j].lat && spots[i].lng == spots[j].lng){
+                    console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
+                    console.log('i='+i,'j='+j);
+                }
+                else {
+                }
+            }
+        }
+    }
+}

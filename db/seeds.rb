@@ -20,5 +20,4 @@ def csv_import(csv_name)
 		end
 	end
 end
-
 csv_import('notes')
