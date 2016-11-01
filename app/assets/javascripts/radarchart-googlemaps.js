@@ -386,11 +386,6 @@ $("#a5").on('click', function(e) {
     $.getJSON("notes.json", function(spots) {
         /* 同地点を判別する*/
         CheckSamePlace(spots);
-        for (var i=0;i<spots.length; i++){
-            blankScores = formatData[i][5];
-            markers[i] = RADAR_CHART.createMarker(spots[i], map);
-            RADAR_CHART.attachInfoWindow(markers[i],spots[i]["name"], blankScores, i);
-        }
     });
     document.getElementById('content').innerHTML = '<p>項目: 総合平均</p><p>1:ゆたかな生き物</p><p>2:地域とのつながり</p><p>3:快適な水辺</p><p>4:水のきれいさ</p><p>5:自然のすがた</p>';
     e.preventDefault();
@@ -398,12 +393,50 @@ $("#a5").on('click', function(e) {
 
 /* 同地点を判別する関数 */
 function CheckSamePlace(spots){
+    var flag;
     for(var i=0;i<spots.length;i++){
+        flag = false;
         for(var j=spots.length-1;j>i;j--){
             if(spots[i].lat == spots[j].lat && spots[i].lng == spots[j].lng){
                 console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
                 console.log('i='+i,'j='+j);
+                flag = true;
             }
         }
+        blankScores = formatData[i][5];
+        markers[i] = RADAR_CHART.createMarker(spots[i], map);
+        RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);
     }
 }
+
+RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,same) {
+    'use strict';
+
+    var infoWindow = null;
+    function attachSameInfoWindow(){
+        if(infoWindow === null){
+            if(same == false){
+                infoWindow = new google.maps.InfoWindow({
+                    content:　name + '<div id="infodiv' + index + '"></div>'
+                });
+            } else {
+                infoWindow = new google.maps.InfoWindow({
+                    content:　name + '<div id="infodiv' + index + '"></div>',
+                    pixelOffset: new google.maps.Size(20,20)
+                });
+            }
+            infoWindow.open(marker.getMap(), marker);
+            google.maps.event.addListener(infoWindow,'closeclick',function(){
+                infoWindow = null;
+            });
+        }
+        google.maps.event.addListener(infoWindow, 'domready', function () {
+                RADAR_CHART.radarChart(index, blankScores);
+        });
+    }
+
+    attachSameInfoWindow();
+    google.maps.event.addListener(marker, 'click', function () {
+        attachInfoWindow();
+    });
+};
