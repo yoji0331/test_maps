@@ -376,7 +376,7 @@ function CheckSamePlace(spots){
     var flag;
     for(var i=0;i<spots.length;i++){
         flag = false;
-        for(var j=spots.length-1;j>i;j--){
+        for(var j=0;j<i;j++){
             if(spots[i].lat == spots[j].lat && spots[i].lng == spots[j].lng){
                 console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
                 console.log('i='+i,'j='+j);
@@ -402,7 +402,7 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
             } else {
                 infoWindow = new google.maps.InfoWindow({
                     content:　name + '<div id="infodiv' + index + '"></div>',
-                    pixelOffset: new google.maps.Size(250 * (index + 1), 0)
+                    pixelOffset: new google.maps.Size(250, 0)
                 });
             }
             infoWindow.open(marker.getMap(), marker);
