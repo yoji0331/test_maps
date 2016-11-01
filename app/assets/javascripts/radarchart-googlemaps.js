@@ -422,7 +422,7 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
             } else {
                 infoWindow = new google.maps.InfoWindow({
                     content:　name + '<div id="infodiv' + index + '"></div>',
-                    pixelOffset: new google.maps.Size(20,20)
+                    pixelOffset: new google.maps.Size(250 * (index + 1), 0)
                 });
             }
             infoWindow.open(marker.getMap(), marker);
