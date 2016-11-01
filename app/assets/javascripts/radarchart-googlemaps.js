@@ -249,11 +249,7 @@ $("#a0").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        for (var i=0;i<spots.length; i++){
-            blankScores = formatData[i][0];
-            markers[i] = RADAR_CHART.createMarker(spots[i], map);
-            RADAR_CHART.attachInfoWindow(markers[i],spots[i]["name"], blankScores, i);
-        }
+        CheckSamePlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 自然のすがた</p><p>1:岸のようすは自然らしいですか？</p><p>2:水の流れはゆたかですか？</p><p>3:魚が川をさかのぼれるだろうか？</p>';
  
@@ -276,11 +272,7 @@ $("#a1").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        for (var i=0;i<spots.length; i++){
-            blankScores = formatData[i][1];
-            markers[i] = RADAR_CHART.createMarker(spots[i], map);
-            RADAR_CHART.attachInfoWindow(markers[i],spots[i]["name"], blankScores, i);
-        }
+        CheckSamePlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: ゆたかな生き物</p><p>1:海底に生き物がいますか？</p><p>2:河原と水辺に植物が生えていますか？</p><p>3:魚がいますか？</p><p>4:鳥はいますか？</p>';
 
@@ -303,11 +295,7 @@ $("#a2").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        for (var i=0;i<spots.length; i++){
-            blankScores = formatData[i][2];
-            markers[i] = RADAR_CHART.createMarker(spots[i], map);
-            RADAR_CHART.attachInfoWindow(markers[i],spots[i]["name"], blankScores, i);
-        }
+        CheckSamePlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 水のきれいさ</p><p>1:水はきれいですか？</p><p>2:水はくさくないですか？</p><p>3:水は透明ですか？</p>';
 
@@ -330,11 +318,7 @@ $("#a3").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        for (var i=0;i<spots.length; i++){
-            blankScores = formatData[i][3];
-            markers[i] = RADAR_CHART.createMarker(spots[i], map);
-            RADAR_CHART.attachInfoWindow(markers[i],spots[i]["name"], blankScores, i);
-        }
+        CheckSamePlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 快適な水辺</p><p>1:ごみが目につきますか？</p><p>2:どんなにおいを感じますか？</p><p>3:どんな音が聞こえますか？</p><p>4:川やまわりの景色は美しいですか？</p><p>5:水にふれてみたいですか？</p>';
 
@@ -357,11 +341,7 @@ $("#a4").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        for (var i=0;i<spots.length; i++){
-            blankScores = formatData[i][4];
-            markers[i] = RADAR_CHART.createMarker(spots[i], map);
-            RADAR_CHART.attachInfoWindow(markers[i],spots[i]["name"], blankScores, i);
-        }
+        CheckSamePlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 地域とのつながり</p><p>1:多くの人が利用していますか？</p><p>2:川にまつわる話を聞いたことがありますか？</p><p>3:水辺に近づきやすいですか？</p><p>4:環境の活動</p><p>5:産業などの活動</p>';
 
