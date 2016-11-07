@@ -249,7 +249,7 @@ $("#a0").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        CheckSamePlace(spots);
+        CheckNearPlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 自然のすがた</p><p>1:岸のようすは自然らしいですか？</p><p>2:水の流れはゆたかですか？</p><p>3:魚が川をさかのぼれるだろうか？</p>';
  
@@ -272,7 +272,7 @@ $("#a1").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        CheckSamePlace(spots);
+        CheckNearPlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: ゆたかな生き物</p><p>1:海底に生き物がいますか？</p><p>2:河原と水辺に植物が生えていますか？</p><p>3:魚がいますか？</p><p>4:鳥はいますか？</p>';
 
@@ -295,7 +295,7 @@ $("#a2").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        CheckSamePlace(spots);
+        CheckNearPlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 水のきれいさ</p><p>1:水はきれいですか？</p><p>2:水はくさくないですか？</p><p>3:水は透明ですか？</p>';
 
@@ -318,7 +318,7 @@ $("#a3").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        CheckSamePlace(spots);
+        CheckNearPlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 快適な水辺</p><p>1:ごみが目につきますか？</p><p>2:どんなにおいを感じますか？</p><p>3:どんな音が聞こえますか？</p><p>4:川やまわりの景色は美しいですか？</p><p>5:水にふれてみたいですか？</p>';
 
@@ -341,7 +341,7 @@ $("#a4").on('click', function(e) {
     map = new google.maps.Map($('#map').get(0), options);
 
     $.getJSON("notes.json", function(spots) {
-        CheckSamePlace(spots);
+        CheckNearPlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 地域とのつながり</p><p>1:多くの人が利用していますか？</p><p>2:川にまつわる話を聞いたことがありますか？</p><p>3:水辺に近づきやすいですか？</p><p>4:環境の活動</p><p>5:産業などの活動</p>';
 
@@ -365,23 +365,66 @@ $("#a5").on('click', function(e) {
 
     $.getJSON("notes.json", function(spots) {
         /* 同地点を判別する*/
-        CheckSamePlace(spots);
+        CheckNearPlace(spots);
     });
     document.getElementById('content').innerHTML = '<p>項目: 総合平均</p><p>1:ゆたかな生き物</p><p>2:地域とのつながり</p><p>3:快適な水辺</p><p>4:水のきれいさ</p><p>5:自然のすがた</p>';
     e.preventDefault();
 });
 
 /* 同地点を判別する関数 */
+/* 同地点付近を判別する関数を作成 */
 function CheckSamePlace(spots){
     var flag;
     for(var i=0;i<spots.length;i++){
         flag = false;
+        Find_1second_distance_by_LatLng(spots[i].lat,spots[i].lng);
         for(var j=0;j<i;j++){
             if(spots[i].lat == spots[j].lat && spots[i].lng == spots[j].lng){
                 console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
                 console.log('i='+i,'j='+j);
                 flag = true;
             }
+        }
+        blankScores = formatData[i][5];
+        markers[i] = RADAR_CHART.createMarker(spots[i], map);
+        RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);
+    }
+}
+
+function Find_1second_distance_by_LatLng(lat, lng){
+    var lat0,lng0;
+    var earthradius = 6378150;
+    var circumference = 2 * Math.PI * earthradius;
+    lat0 = circumference / (360 * 60 * 60);
+    var lng0 = earthradius * Math.cos(lng / 180 * Math.PI) * 2 * Math.PI / (360 * 60 * 60)
+    if(lng0 < 0){
+        lng0 = lng0 * -1;
+    }
+    console.log(lat0,lng0);
+}
+function CreateIntersects(lat,lng){
+    var lat0 = parseInt(lat * 100000);
+    var lng0 = parseInt(lng * 100000);
+    dis = 5;
+    var sw = new google.maps.LatLng((lat0-dis) / 100000,(lng0+dis) / 100000);
+    var ne = new google.maps.LatLng((lat0+dis) / 100000,(lng0-dis) / 100000);
+    var latlngBounds = new google.maps.LatLngBounds(sw, ne);
+    return latlngBounds;
+}
+
+function CheckNearPlace(spots){
+    var flag;
+    var latlngBounds1,latlngBounds2;
+    for(var i=0;i<spots.length;i++){
+        flag = false;
+        latlngBounds1 = CreateIntersects(spots[i].lat, spots[i].lng);
+        for(var j=0;j<i;j++){
+            latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng);
+            if(latlngBounds1.intersects(latlngBounds2) == true){
+                console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
+                console.log('i='+i,'j='+j);
+                flag = true;
+            }                
         }
         blankScores = formatData[i][5];
         markers[i] = RADAR_CHART.createMarker(spots[i], map);
@@ -402,7 +445,7 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
             } else {
                 infoWindow = new google.maps.InfoWindow({
                     content:　name + '<div id="infodiv' + index + '"></div>',
-                    pixelOffset: new google.maps.Size(250, 0)
+                    pixelOffset: new google.maps.Size(-100 * index, 50 * index)
                 });
             }
             infoWindow.open(marker.getMap(), marker);
@@ -417,6 +460,6 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
 
     attachSameInfoWindow();
     google.maps.event.addListener(marker, 'click', function () {
-        attachInfoWindow();
+        attachSameInfoWindow();
     });
 };
