@@ -12,6 +12,9 @@ var blankScores = [],
     score,
     markers = [];
 
+var lat_array = [];
+var lng_array = [];
+
 center = new google.maps.LatLng(35.5614174, 139.6928321);
 
 options = {
@@ -30,13 +33,30 @@ function mpp(zoom){
     var one_pixel = equator / (256 * 2 ** zoom);
     console.log(one_pixel);
     return one_pixel;
-
 }
+
+function MarkerClear(){
+    if(markers.length > 0){
+        for(var i=0;i<markers.length; i++){
+            markers[i].setMap();
+        }
+    }
+};
 
 google.maps.event.addListener(map,'zoom_changed', function(){
         console.log(map.getZoom());
         var zoom = map.getZoom();
         mpp(zoom);
+        MarkerClear();
+
+        for(var i=0;i<lat_array.length;i++){
+            console.log(lat_array[i], lng_array[i]);
+            RADAR_CHART.removeRadarchart(i);        
+        }
+        $.getJSON("notes.json", function(spots) {
+            /* 同地点を判別する*/
+            CheckNearPlace(spots, score);
+        });
 });
 
 /* jsonの成型 */
@@ -211,6 +231,10 @@ RADAR_CHART.radarChart = function (index, scores) {
      .attr("font-size", "15px");
 };
 
+RADAR_CHART.removeRadarchart = function(index){
+    var svg = d3.select('#infodiv' + index).remove();
+}
+
 RADAR_CHART.createMarker = function (spot, map) {
     'use strict';
     var marker = new google.maps.Marker({
@@ -229,7 +253,7 @@ $("#a0").on('click', function(e) {
     var blankScores =[];
     score=0;
     for(var i=0;i<markers.length;i++){
-        markers[i].setMap(null);
+        markers[i].setMap();
     };
 
     $.getJSON("notes.json", function(spots) {
@@ -246,7 +270,7 @@ $("#a1").on('click', function(e) {
     var blankScores =[];
     score=1;
     for(var i=0;i<markers.length;i++){
-        markers[i].setMap(null);
+        markers[i].setMap();
     };
 
     $.getJSON("notes.json", function(spots) {
@@ -263,7 +287,7 @@ $("#a2").on('click', function(e) {
     var blankScores =[];
     score=2;
     for(var i=0;i<markers.length;i++){
-        markers[i].setMap(null);
+        markers[i].setMap();
     };
 
     $.getJSON("notes.json", function(spots) {
@@ -280,7 +304,7 @@ $("#a3").on('click', function(e) {
     var blankScores =[];
     score=3;    
     for(var i=0;i<markers.length;i++){
-        markers[i].setMap(null);
+        markers[i].setMap();
     };
 
     $.getJSON("notes.json", function(spots) {
@@ -297,7 +321,7 @@ $("#a4").on('click', function(e) {
     var blankScores =[];
     score=4;    
     for(var i=0;i<markers.length;i++){
-        markers[i].setMap(null);
+        markers[i].setMap();
     };
 
     $.getJSON("notes.json", function(spots) {
@@ -314,7 +338,7 @@ $("#a5").on('click', function(e) {
     var blankScores =[];
     score=5;
     for(var i=0;i<markers.length;i++){
-        markers[i].setMap(null);
+        markers[i].setMap();
     };
     $.getJSON("notes.json", function(spots) {
         /* 同地点を判別する*/
@@ -351,22 +375,24 @@ function CreateIntersects(lat,lng,diff){
 }
 
 function CheckNearPlace(spots,score){
+
     var flag;
     var latlngBounds1,latlngBounds2;
-    console.log(markers.length);
     for(var i=0;i<spots.length;i++){
         flag = false;
         latlngBounds1 = CreateIntersects(spots[i].lat, spots[i].lng,Find(spots[i].lat,spots[i].lng));
         for(var j=0;j<i;j++){
             latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng,Find(spots[j].lat, spots[i].lng));
             if(latlngBounds1.intersects(latlngBounds2) == true){
-                console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
+                console.log(spots[i].name + 'と' + spots[j].name + 'はかぶっています');
                 console.log('i='+i,'j='+j);
                 flag = true;
             }                
         }
         blankScores = formatData[i][score];        
         markers[i] = RADAR_CHART.createMarker(spots[i], map);
+        lat_array.push(spots[i].lat);
+        lng_array.push(spots[i].lng);
         RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);
         Find(spots[i].lat, spots[i].lng);
 
