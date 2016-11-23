@@ -31,6 +31,7 @@ function mpp(zoom){
     var equator = 40075334.2563;
     // 1ピクセルあたりの距離
     var one_pixel = equator / (256 * 2 ** zoom);
+    console.log(zoom);
     console.log(one_pixel);
     return one_pixel;
 }
@@ -44,19 +45,21 @@ function MarkerClear(){
 };
 
 google.maps.event.addListener(map,'zoom_changed', function(){
-        console.log(map.getZoom());
+    if(markers.length > 0){
         var zoom = map.getZoom();
+        console.log('akl;dfa' + zoom);
         mpp(zoom);
         MarkerClear();
 
         for(var i=0;i<lat_array.length;i++){
-            console.log(lat_array[i], lng_array[i]);
             RADAR_CHART.removeRadarchart(i);        
         }
         $.getJSON("notes.json", function(spots) {
             /* 同地点を判別する*/
-            CheckNearPlace(spots, score);
+          CheckNearPlace(spots, score,zoom);
         });
+    };
+        
 });
 
 /* jsonの成型 */
@@ -342,7 +345,8 @@ $("#a5").on('click', function(e) {
     };
     $.getJSON("notes.json", function(spots) {
         /* 同地点を判別する*/
-        CheckNearPlace(spots, score);
+        var zoom = map.getZoom();
+        CheckNearPlace(spots, score,zoom);
     });
 
     document.getElementById('content').innerHTML = '<p>項目: 総合平均</p><p>1:ゆたかな生き物</p><p>2:地域とのつながり</p><p>3:快適な水辺</p><p>4:水のきれいさ</p><p>5:自然のすがた</p>';
@@ -374,19 +378,19 @@ function CreateIntersects(lat,lng,diff){
     return latlngBounds;
 }
 
-function CheckNearPlace(spots,score){
-
+function CheckNearPlace(spots,score,zoom){
+    console.log(zoom);
     var flag;
     var latlngBounds1,latlngBounds2;
     for(var i=0;i<spots.length;i++){
         flag = false;
-        latlngBounds1 = CreateIntersects(spots[i].lat, spots[i].lng,Find(spots[i].lat,spots[i].lng));
+        latlngBounds1 = CreateIntersects(spots[i].lat, spots[i].lng,Find(spots[i].lat,spots[i].lng,zoom));
         for(var j=0;j<i;j++){
-            latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng,Find(spots[j].lat, spots[i].lng));
+            latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng,Find(spots[j].lat, spots[i].lng,zoom));
             if(latlngBounds1.intersects(latlngBounds2) == true){
-                console.log(spots[i].name + 'と' + spots[j].name + 'はかぶっています');
+                /*console.log(spots[i].name + 'と' + spots[j].name + 'はかぶっています');
                 console.log('i='+i,'j='+j);
-                flag = true;
+                */flag = true;
             }                
         }
         blankScores = formatData[i][score];        
@@ -434,7 +438,7 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
 };
 
 
-function Find(lat,lng){
+function Find(lat,lng,zoom){
     var lat0,lng0;
     var earthradius = 6378150;
     var circumference = 2 * Math.PI * earthradius;
@@ -443,9 +447,9 @@ function Find(lat,lng){
     if(lng0 < 0){
         lng0 = lng0 * -1;
     }
-    console.log(lat0,lng0);
+    console.log(zoom);
     // 100pxでは何秒ずれるか
-    var temp = mpp(13) * 100 / lat0;
-    console.log(temp);
+    var temp = mpp(zoom) * 100 / lat0;
+    // console.log(temp);
     return temp;
 }
