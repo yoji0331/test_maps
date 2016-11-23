@@ -174,7 +174,7 @@ DEPENDENCIES
   less-rails
   nokogiri (= 1.6.0)
   rails (= 4.2.0)
-  sass-rails (~> 5.0)
+  sass-rails
   sdoc (~> 0.4.0)
   spring
   sqlite3
