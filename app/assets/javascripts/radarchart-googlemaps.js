@@ -9,6 +9,7 @@ var blankScores = [],
     center,
     options,
     map,
+    score,
     markers = [];
 
 center = new google.maps.LatLng(35.5614174, 139.6928321);
@@ -21,8 +22,21 @@ options = {
 
 map = new google.maps.Map($('#map').get(0), options);
 
+/* zoomの値から1pxあたり何mかを計算する */
+function mpp(zoom){
+    // 赤道の距離
+    var equator = 40075334.2563;
+    // 1ピクセルあたりの距離
+    var one_pixel = equator / (256 * 2 ** zoom);
+    console.log(one_pixel);
+    return one_pixel;
+
+}
+
 google.maps.event.addListener(map,'zoom_changed', function(){
         console.log(map.getZoom());
+        var zoom = map.getZoom();
+        mpp(zoom);
 });
 
 /* jsonの成型 */
@@ -213,7 +227,7 @@ RADAR_CHART.createMarker = function (spot, map) {
 // formatData[][0]
 $("#a0").on('click', function(e) {
     var blankScores =[];
-    var score=0;
+    score=0;
     for(var i=0;i<markers.length;i++){
         markers[i].setMap(null);
     };
@@ -230,7 +244,7 @@ $("#a0").on('click', function(e) {
 // formatData[][1]
 $("#a1").on('click', function(e) {
     var blankScores =[];
-    var score=1;
+    score=1;
     for(var i=0;i<markers.length;i++){
         markers[i].setMap(null);
     };
@@ -247,7 +261,7 @@ $("#a1").on('click', function(e) {
 // formatData[][2]
 $("#a2").on('click', function(e) {
     var blankScores =[];
-    var score=2;
+    score=2;
     for(var i=0;i<markers.length;i++){
         markers[i].setMap(null);
     };
@@ -264,7 +278,7 @@ $("#a2").on('click', function(e) {
 // formatData[][3]
 $("#a3").on('click', function(e) {
     var blankScores =[];
-    var score=3;    
+    score=3;    
     for(var i=0;i<markers.length;i++){
         markers[i].setMap(null);
     };
@@ -281,7 +295,7 @@ $("#a3").on('click', function(e) {
 // formatData[][4]
 $("#a4").on('click', function(e) {
     var blankScores =[];
-    var score=4;    
+    score=4;    
     for(var i=0;i<markers.length;i++){
         markers[i].setMap(null);
     };
@@ -298,7 +312,7 @@ $("#a4").on('click', function(e) {
 // formatData[][5]
 $("#a5").on('click', function(e) {
     var blankScores =[];
-    var score=5;
+    score=5;
     for(var i=0;i<markers.length;i++){
         markers[i].setMap(null);
     };
@@ -326,10 +340,10 @@ function Find_1second_distance_by_LatLng(lat, lng){
     }
     console.log(lat0,lng0);
 }
-function CreateIntersects(lat,lng){
+function CreateIntersects(lat,lng,diff){
     var lat0 = parseInt(lat * 100000);
     var lng0 = parseInt(lng * 100000);
-    var dis = 5;
+    var dis = diff;
     var sw = new google.maps.LatLng((lat0-dis) / 100000,(lng0+dis) / 100000);
     var ne = new google.maps.LatLng((lat0+dis) / 100000,(lng0-dis) / 100000);
     var latlngBounds = new google.maps.LatLngBounds(sw, ne);
@@ -342,9 +356,9 @@ function CheckNearPlace(spots,score){
     console.log(markers.length);
     for(var i=0;i<spots.length;i++){
         flag = false;
-        latlngBounds1 = CreateIntersects(spots[i].lat, spots[i].lng);
+        latlngBounds1 = CreateIntersects(spots[i].lat, spots[i].lng,Find(spots[i].lat,spots[i].lng));
         for(var j=0;j<i;j++){
-            latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng);
+            latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng,Find(spots[j].lat, spots[i].lng));
             if(latlngBounds1.intersects(latlngBounds2) == true){
                 console.log(spots[i].name + 'と' + spots[j].name + 'は同じ緯度経度です');
                 console.log('i='+i,'j='+j);
@@ -354,6 +368,8 @@ function CheckNearPlace(spots,score){
         blankScores = formatData[i][score];        
         markers[i] = RADAR_CHART.createMarker(spots[i], map);
         RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);
+        Find(spots[i].lat, spots[i].lng);
+
     }
 
 }
@@ -392,4 +408,18 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
 };
 
 
-    
+function Find(lat,lng){
+    var lat0,lng0;
+    var earthradius = 6378150;
+    var circumference = 2 * Math.PI * earthradius;
+    lat0 = circumference / (360 * 60 * 60);
+    var lng0 = earthradius * Math.cos(lng / 180 * Math.PI) * 2 * Math.PI / (360 * 60 * 60)
+    if(lng0 < 0){
+        lng0 = lng0 * -1;
+    }
+    console.log(lat0,lng0);
+    // 100pxでは何秒ずれるか
+    var temp = mpp(13) * 100 / lat0;
+    console.log(temp);
+    return temp;
+}
