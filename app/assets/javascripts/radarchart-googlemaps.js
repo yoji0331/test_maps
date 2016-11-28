@@ -14,6 +14,8 @@ var blankScores = [],
 
 var lat_array = [];
 var lng_array = [];
+var window_open_array = [];
+
 
 center = new google.maps.LatLng(35.5614174, 139.6928321);
 
@@ -31,8 +33,6 @@ function mpp(zoom){
     var equator = 40075334.2563;
     // 1ピクセルあたりの距離
     var one_pixel = equator / (256 * 2 ** zoom);
-    console.log(zoom);
-    console.log(one_pixel);
     return one_pixel;
 }
 
@@ -47,7 +47,6 @@ function MarkerClear(){
 google.maps.event.addListener(map,'zoom_changed', function(){
     if(markers.length > 0){
         var zoom = map.getZoom();
-        console.log('akl;dfa' + zoom);
         mpp(zoom);
         MarkerClear();
 
@@ -346,6 +345,10 @@ $("#a5").on('click', function(e) {
     $.getJSON("notes.json", function(spots) {
         /* 同地点を判別する*/
         var zoom = map.getZoom();
+        for(var i=0;i<spots.length;i++){
+
+            window_open_array.push(1);
+        }
         CheckNearPlace(spots, score,zoom);
     });
 
@@ -366,7 +369,6 @@ function Find_1second_distance_by_LatLng(lat, lng){
     if(lng0 < 0){
         lng0 = lng0 * -1;
     }
-    console.log(lat0,lng0);
 }
 function CreateIntersects(lat,lng,diff){
     var lat0 = parseInt(lat * 100000);
@@ -379,7 +381,6 @@ function CreateIntersects(lat,lng,diff){
 }
 
 function CheckNearPlace(spots,score,zoom){
-    console.log(zoom);
     var flag;
     var latlngBounds1,latlngBounds2;
     for(var i=0;i<spots.length;i++){
@@ -388,16 +389,16 @@ function CheckNearPlace(spots,score,zoom){
         for(var j=0;j<i;j++){
             latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng,Find(spots[j].lat, spots[i].lng,zoom));
             if(latlngBounds1.intersects(latlngBounds2) == true){
-                /*console.log(spots[i].name + 'と' + spots[j].name + 'はかぶっています');
-                console.log('i='+i,'j='+j);
-                */flag = true;
+                flag = true;
             }                
         }
         blankScores = formatData[i][score];        
         markers[i] = RADAR_CHART.createMarker(spots[i], map);
         lat_array.push(spots[i].lat);
         lng_array.push(spots[i].lng);
-        RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);
+        if(window_open_array[i] == 1){
+            RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);     
+        }
         Find(spots[i].lat, spots[i].lng);
 
     }
@@ -414,16 +415,20 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
                 infoWindow = new google.maps.InfoWindow({
                     content:　name + '<div id="infodiv' + index + '"></div>'
                 });
+                window_open_array[index] = 1;
             } else {
                 infoWindow = new google.maps.InfoWindow({
                     content:　name + '<div id="infodiv' + index + '"></div>',
                     pixelOffset: new google.maps.Size(-100 * index, 50 * index)
                 });
+                window_open_array[index] = 1;
             }
             infoWindow.close();
             infoWindow.open(marker.getMap(), marker);
             google.maps.event.addListener(infoWindow,'closeclick',function(){
+                window_open_array[index] = 0;
                 infoWindow = null;
+
             });
         }
         google.maps.event.addListener(infoWindow, 'domready', function () {
@@ -432,6 +437,7 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
     }
 
     attachSameInfoWindow();
+        
     google.maps.event.addListener(marker, 'click', function () {
         attachSameInfoWindow();
     });
@@ -447,9 +453,7 @@ function Find(lat,lng,zoom){
     if(lng0 < 0){
         lng0 = lng0 * -1;
     }
-    console.log(zoom);
     // 100pxでは何秒ずれるか
     var temp = mpp(zoom) * 100 / lat0;
-    // console.log(temp);
     return temp;
 }
