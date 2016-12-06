@@ -301,37 +301,10 @@ RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,sa
     marker.addListener('click', function(){
         infoWindow.open(map, marker)
     })
-/*
-    google.maps.event.addListener(marker, 'click', function () {
-        console.log("click");
-        if(infoWindow == null){
-            if(same == false){
-              infoWindow = new google.maps.InfoWindow({
-                  content:　name + '<div id="infodiv' + index + '"></div>'
-                });
-            } else {
-                infoWindow = new google.maps.InfoWindow({
-                    content:　name + '<div id="infodiv' + index + '"></div>',
-                    pixelOffset: new google.maps.Size(-100 * index, 50 * index)
-                });
-            }
-            infoWindow.open(marker.getMap(), marker);
-            google.maps.event.addListener(infoWindow,'closeclick',function(){
-                window_open_array[index] = 0;
-                infoWindow == null;
-            });
-        }
-      google.maps.event.addListener(infoWindow, 'domready', function () {
-          RADAR_CHART.radarChart(index, blankScores);
-      });
-      infoWindow.open();
-      window_open_array[index] = 1;
-    });
-*/
 };
 
 /* メイン関数 */
-    /* get.JSON()の処理 */
+/* get.JSON()の処理 */
 $(document).ready(function(){
     $.getJSON("notes.json", function (spots) {
         var i;
@@ -364,8 +337,8 @@ $(document).ready(function(){
     });
 });
 
+/* デフォルトのビューを表示 */
 $(window).load(function(){
-    /* デフォルトのビューを表示 */
     (function def() {
         var blankScores =[];
         score=5;
@@ -378,6 +351,14 @@ $(window).load(function(){
     }());    
 });
 
-    /* イベントハンドラ */
-        /* メニューを切り替えた際の処理 */
-
+/* イベントハンドラ */
+map.addListener('zoom_changed', function(){
+    if(markers.length > 0){
+        var zoom = map.getZoom();
+        MarkerClear();
+        for(var i=0;i<lat_array.length;i++){
+            RADAR_CHART.removeRadarchart(i);        
+        }
+    }
+    CheckNearPlace(obj, score,zoom);
+});
