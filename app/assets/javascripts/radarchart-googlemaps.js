@@ -1,7 +1,9 @@
+
+/* グローバル関数の宣言 */
+
 /*global google, $, window, d3 */
 /*jslint browser:true, devel:true, this:true, for:true */
 /*global google, d3, $ */
-
 
 'use strict';
 
@@ -15,17 +17,25 @@ var blankScores = [],
 var lat_array = [];
 var lng_array = [];
 var window_open_array = [];
+var obj = [];
 
+var RADAR_CHART = {};
+
+var formatData = [];
+for(var i=0;i<4;i++){
+    formatData[i] = new Array(6);
+}
 
 center = new google.maps.LatLng(35.5614174, 139.6928321);
-
 options = {
-    zoom: 13,
+    zoom: 10,
     center: center,
     mapTypeId: google.maps.MapTypeId.ROADMAP
 };
-
 map = new google.maps.Map($('#map').get(0), options);
+
+
+/* 関数群の宣言 */
 
 /* zoomの値から1pxあたり何mかを計算する */
 function mpp(zoom){
@@ -44,58 +54,68 @@ function MarkerClear(){
     }
 };
 
-google.maps.event.addListener(map,'zoom_changed', function(){
-    if(markers.length > 0){
-        var zoom = map.getZoom();
-        mpp(zoom);
-        MarkerClear();
-
-        for(var i=0;i<lat_array.length;i++){
-            RADAR_CHART.removeRadarchart(i);        
-        }
-        $.getJSON("notes.json", function(spots) {
-            /* 同地点を判別する*/
-          CheckNearPlace(spots, score,zoom);
-        });
-    };
-        
-});
-
-/* jsonの成型 */
-$.getJSON("notes.json", function (spots) {
-    var i;
-    var isObject = function(o) {
-        return (o instanceof Object && !(o instanceof Array)) ? true : false;
-    };
-    for(i=0; i<spots.length;i++){
-        var obj = spots[i];
-        var key01;
-        var dataArray;
-        var j;
-        j=0;
-        for(key01 in obj){
-            if (!isObject(obj[key01])){
-            } else {
-                var key02;
-                dataArray = [];
-                for( key02 in obj[key01]){
-                    dataArray.push(obj[key01][key02]);
-                }
-                formatData[i][j] = dataArray;
-                j++;
-            }
-        }
+function Find_1second_distance_by_LatLng(lat, lng){
+    var lat0,lng0;
+    var earthradius = 6378150;
+    var circumference = 2 * Math.PI * earthradius;
+    lat0 = circumference / (360 * 60 * 60);
+    var lng0 = earthradius * Math.cos(lng / 180 * Math.PI) * 2 * Math.PI / (360 * 60 * 60)
+    if(lng0 < 0){
+        lng0 = lng0 * -1;
     }
-});
-
-
-var RADAR_CHART = {};
-
-var formatData = [];
-for(var i=0;i<4;i++){
-    formatData[i] = new Array(6);
+}
+function CreateIntersects(lat,lng,diff){
+    var lat0 = parseInt(lat * 100000);
+    var lng0 = parseInt(lng * 100000);
+    var dis = diff;
+    var sw = new google.maps.LatLng((lat0-dis) / 100000,(lng0+dis) / 100000);
+    var ne = new google.maps.LatLng((lat0+dis) / 100000,(lng0-dis) / 100000);
+    var latlngBounds = new google.maps.LatLngBounds(sw, ne);
+    return latlngBounds;
 }
 
+function CheckNearPlace(spots,score,zoom){
+    var flag;
+    var latlngBounds1,latlngBounds2;
+    for(var i=0;i<spots.length;i++){
+        flag = false;
+        latlngBounds1 = CreateIntersects(spots[i].lat, spots[i].lng,Find(spots[i].lat,spots[i].lng,zoom));
+        for(var j=0;j<i;j++){
+            latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng,Find(spots[j].lat, spots[i].lng,zoom));
+            if(latlngBounds1.intersects(latlngBounds2) == true){
+                flag = true;
+            }                
+        }
+        blankScores = formatData[i][score];
+        markers[i] = RADAR_CHART.createMarker(spots[i], map);
+        lat_array.push(spots[i].lat);
+        lng_array.push(spots[i].lng);
+        if(window_open_array[i] == 1){
+            RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);
+        }
+        Find(spots[i].lat, spots[i].lng);
+
+    }
+
+}
+function Find(lat,lng,zoom){
+    var lat0,lng0;
+    var earthradius = 6378150;
+    var circumference = 2 * Math.PI * earthradius;
+    lat0 = circumference / (360 * 60 * 60);
+    var lng0 = earthradius * Math.cos(lng / 180 * Math.PI) * 2 * Math.PI / (360 * 60 * 60)
+    if(lng0 < 0){
+        lng0 = lng0 * -1;
+    }
+    // 100pxでは何秒ずれるか
+    var temp = mpp(zoom) * 100 / lat0;
+    return temp;
+}
+
+
+
+
+/* RADAR_CHARTクラス */
 RADAR_CHART.radarChart = function (index, scores) {
     'use strict';
 
@@ -117,10 +137,12 @@ RADAR_CHART.radarChart = function (index, scores) {
     h = 200;
     padding = 30;
 
+
     svg = d3.select('#infodiv' + index)
         .append('svg')
         .attr('width', w)
         .attr('height', h);
+    
 
     dataset = [scores];
 
@@ -247,213 +269,115 @@ RADAR_CHART.createMarker = function (spot, map) {
     return marker;
 };
 
-
-
-// 自然のすがた
-// formatData[][0]
-$("#a0").on('click', function(e) {
-    var blankScores =[];
-    score=0;
-    for(var i=0;i<markers.length;i++){
-        markers[i].setMap();
-    };
-
-    $.getJSON("notes.json", function(spots) {
-        CheckNearPlace(spots, score);
-    });
-    document.getElementById('content').innerHTML = '<p>項目: 自然のすがた</p><p>1:岸のようすは自然らしいですか？</p><p>2:水の流れはゆたかですか？</p><p>3:魚が川をさかのぼれるだろうか？</p>';
- 
-    e.preventDefault();
-});
-
-// ゆたかな生き物
-// formatData[][1]
-$("#a1").on('click', function(e) {
-    var blankScores =[];
-    score=1;
-    for(var i=0;i<markers.length;i++){
-        markers[i].setMap();
-    };
-
-    $.getJSON("notes.json", function(spots) {
-        CheckNearPlace(spots, score);
-    });
-    document.getElementById('content').innerHTML = '<p>項目: ゆたかな生き物</p><p>1:海底に生き物がいますか？</p><p>2:河原と水辺に植物が生えていますか？</p><p>3:魚がいますか？</p><p>4:鳥はいますか？</p>';
-
-    e.preventDefault();
-});
-
-// 水のきれいさ
-// formatData[][2]
-$("#a2").on('click', function(e) {
-    var blankScores =[];
-    score=2;
-    for(var i=0;i<markers.length;i++){
-        markers[i].setMap();
-    };
-
-    $.getJSON("notes.json", function(spots) {
-        CheckNearPlace(spots, score);
-    });
-    document.getElementById('content').innerHTML = '<p>項目: 水のきれいさ</p><p>1:水はきれいですか？</p><p>2:水はくさくないですか？</p><p>3:水は透明ですか？</p>';
-
-    e.preventDefault();
-});
-
-// 快適な水辺
-// formatData[][3]
-$("#a3").on('click', function(e) {
-    var blankScores =[];
-    score=3;    
-    for(var i=0;i<markers.length;i++){
-        markers[i].setMap();
-    };
-
-    $.getJSON("notes.json", function(spots) {
-        CheckNearPlace(spots, score);
-    });
-    document.getElementById('content').innerHTML = '<p>項目: 快適な水辺</p><p>1:ごみが目につきますか？</p><p>2:どんなにおいを感じますか？</p><p>3:どんな音が聞こえますか？</p><p>4:川やまわりの景色は美しいですか？</p><p>5:水にふれてみたいですか？</p>';
-
-    e.preventDefault();
-});
-
-// 地域とのつながり
-// formatData[][4]
-$("#a4").on('click', function(e) {
-    var blankScores =[];
-    score=4;    
-    for(var i=0;i<markers.length;i++){
-        markers[i].setMap();
-    };
-
-    $.getJSON("notes.json", function(spots) {
-        CheckNearPlace(spots, score);
-    });
-    document.getElementById('content').innerHTML = '<p>項目: 地域とのつながり</p><p>1:多くの人が利用していますか？</p><p>2:川にまつわる話を聞いたことがありますか？</p><p>3:水辺に近づきやすいですか？</p><p>4:環境の活動</p><p>5:産業などの活動</p>';
-
-    e.preventDefault();
-});
-
-// 総合平均
-// formatData[][5]
-$("#a5").on('click', function(e) {
-    var blankScores =[];
-    score=5;
-    for(var i=0;i<markers.length;i++){
-        markers[i].setMap();
-    };
-    $.getJSON("notes.json", function(spots) {
-        /* 同地点を判別する*/
-        var zoom = map.getZoom();
-        for(var i=0;i<spots.length;i++){
-
-            window_open_array.push(1);
-        }
-        CheckNearPlace(spots, score,zoom);
-    });
-
-    document.getElementById('content').innerHTML = '<p>項目: 総合平均</p><p>1:ゆたかな生き物</p><p>2:地域とのつながり</p><p>3:快適な水辺</p><p>4:水のきれいさ</p><p>5:自然のすがた</p>';
-    e.preventDefault();
-});
-
-/* 同地点を判別する関数 */
-/* 同地点付近を判別する関数を作成 */
-
-
-function Find_1second_distance_by_LatLng(lat, lng){
-    var lat0,lng0;
-    var earthradius = 6378150;
-    var circumference = 2 * Math.PI * earthradius;
-    lat0 = circumference / (360 * 60 * 60);
-    var lng0 = earthradius * Math.cos(lng / 180 * Math.PI) * 2 * Math.PI / (360 * 60 * 60)
-    if(lng0 < 0){
-        lng0 = lng0 * -1;
-    }
-}
-function CreateIntersects(lat,lng,diff){
-    var lat0 = parseInt(lat * 100000);
-    var lng0 = parseInt(lng * 100000);
-    var dis = diff;
-    var sw = new google.maps.LatLng((lat0-dis) / 100000,(lng0+dis) / 100000);
-    var ne = new google.maps.LatLng((lat0+dis) / 100000,(lng0-dis) / 100000);
-    var latlngBounds = new google.maps.LatLngBounds(sw, ne);
-    return latlngBounds;
-}
-
-function CheckNearPlace(spots,score,zoom){
-    var flag;
-    var latlngBounds1,latlngBounds2;
-    for(var i=0;i<spots.length;i++){
-        flag = false;
-        latlngBounds1 = CreateIntersects(spots[i].lat, spots[i].lng,Find(spots[i].lat,spots[i].lng,zoom));
-        for(var j=0;j<i;j++){
-            latlngBounds2 = CreateIntersects(spots[j].lat, spots[i].lng,Find(spots[j].lat, spots[i].lng,zoom));
-            if(latlngBounds1.intersects(latlngBounds2) == true){
-                flag = true;
-            }                
-        }
-        blankScores = formatData[i][score];        
-        markers[i] = RADAR_CHART.createMarker(spots[i], map);
-        lat_array.push(spots[i].lat);
-        lng_array.push(spots[i].lng);
-        if(window_open_array[i] == 1){
-            RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);     
-        }
-        Find(spots[i].lat, spots[i].lng);
-
-    }
-
-}
-
 RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,same) {
     'use strict';
 
     var infoWindow = null;
-    function attachSameInfoWindow(){
-        if(infoWindow === null){
+    if(infoWindow == null){
             if(same == false){
-                infoWindow = new google.maps.InfoWindow({
-                    content:　name + '<div id="infodiv' + index + '"></div>'
+              infoWindow = new google.maps.InfoWindow({
+                  content:　name + '<div id="infodiv' + index + '"></div>'
                 });
-                window_open_array[index] = 1;
             } else {
                 infoWindow = new google.maps.InfoWindow({
                     content:　name + '<div id="infodiv' + index + '"></div>',
                     pixelOffset: new google.maps.Size(-100 * index, 50 * index)
                 });
-                window_open_array[index] = 1;
             }
-            infoWindow.close();
+        }
+    console.log(window_open_array);
+    infoWindow.addListener('domready', function () {
+        if(window_open_array[index] == 1){
+          RADAR_CHART.radarChart(index, blankScores);
+        }
+    });
+    infoWindow.open(map, marker)
+    infoWindow.addListener('closeclick' , function(){
+        window_open_array[index] = 0;
+        infoWindow.close();
+        console.log(window_open_array);
+    });
+        
+    marker.addListener('click', function(){
+        infoWindow.open(map, marker)
+    })
+/*
+    google.maps.event.addListener(marker, 'click', function () {
+        console.log("click");
+        if(infoWindow == null){
+            if(same == false){
+              infoWindow = new google.maps.InfoWindow({
+                  content:　name + '<div id="infodiv' + index + '"></div>'
+                });
+            } else {
+                infoWindow = new google.maps.InfoWindow({
+                    content:　name + '<div id="infodiv' + index + '"></div>',
+                    pixelOffset: new google.maps.Size(-100 * index, 50 * index)
+                });
+            }
             infoWindow.open(marker.getMap(), marker);
             google.maps.event.addListener(infoWindow,'closeclick',function(){
                 window_open_array[index] = 0;
-                infoWindow = null;
-
+                infoWindow == null;
             });
         }
-        google.maps.event.addListener(infoWindow, 'domready', function () {
-                RADAR_CHART.radarChart(index, blankScores);
-        });
-    }
-
-    attachSameInfoWindow();
-        
-    google.maps.event.addListener(marker, 'click', function () {
-        attachSameInfoWindow();
+      google.maps.event.addListener(infoWindow, 'domready', function () {
+          RADAR_CHART.radarChart(index, blankScores);
+      });
+      infoWindow.open();
+      window_open_array[index] = 1;
     });
+*/
 };
 
+/* メイン関数 */
+    /* get.JSON()の処理 */
+$(document).ready(function(){
+    $.getJSON("notes.json", function (spots) {
+        var i;
+        var isObject = function(o) {
+            return (o instanceof Object && !(o instanceof Array)) ? true : false;
+        };
+        for(i=0; i<spots.length;i++){
 
-function Find(lat,lng,zoom){
-    var lat0,lng0;
-    var earthradius = 6378150;
-    var circumference = 2 * Math.PI * earthradius;
-    lat0 = circumference / (360 * 60 * 60);
-    var lng0 = earthradius * Math.cos(lng / 180 * Math.PI) * 2 * Math.PI / (360 * 60 * 60)
-    if(lng0 < 0){
-        lng0 = lng0 * -1;
-    }
-    // 100pxでは何秒ずれるか
-    var temp = mpp(zoom) * 100 / lat0;
-    return temp;
-}
+            obj.push(spots[i]);
+            window_open_array[i] = 1;
+            var object = spots[i];
+            var key01;
+            var dataArray;
+            var j;
+            j=0;
+            for(key01 in object){
+                if (!isObject(object[key01])){
+                } else {
+                    var key02;
+                    dataArray = [];
+                    for( key02 in object[key01]){
+
+                        dataArray.push(object[key01][key02]);
+                    }
+                    formatData[i][j] = dataArray;
+                    j++;
+                }
+            }
+        }
+    });
+});
+
+$(window).load(function(){
+    /* デフォルトのビューを表示 */
+    (function def() {
+        var blankScores =[];
+        score=5;
+        for(var i=0;i<markers.length;i++){
+            markers[i].setMap();
+        };
+        var zoom = map.getZoom();
+        CheckNearPlace(obj, score,zoom);
+        document.getElementById('content').innerHTML = '<p>項目: 総合平均</p><p>1:ゆたかな生き物</p><p>2:地域とのつながり</p><p>3:快適な水辺</p><p>4:水のきれいさ</p><p>5:自然のすがた</p>';
+    }());    
+});
+
+    /* イベントハンドラ */
+        /* メニューを切り替えた際の処理 */
+
