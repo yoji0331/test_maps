@@ -90,9 +90,8 @@ function CheckNearPlace(spots,score,zoom){
         markers[i] = RADAR_CHART.createMarker(spots[i], map);
         lat_array.push(spots[i].lat);
         lng_array.push(spots[i].lng);
-        if(window_open_array[i] == 1){
-            RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);
-        }
+        RADAR_CHART.removeRadarchart(i);
+        RADAR_CHART.attachSameInfoWindow(markers[i],spots[i]["name"], blankScores, i, flag);
         Find(spots[i].lat, spots[i].lng);
 
     }
@@ -272,34 +271,36 @@ RADAR_CHART.createMarker = function (spot, map) {
 RADAR_CHART.attachSameInfoWindow = function (marker, name, blankScores, index,same) {
     'use strict';
 
-    var infoWindow = null;
-    if(infoWindow == null){
-            if(same == false){
-              infoWindow = new google.maps.InfoWindow({
-                  content:　name + '<div id="infodiv' + index + '"></div>'
-                });
-            } else {
-                infoWindow = new google.maps.InfoWindow({
-                    content:　name + '<div id="infodiv' + index + '"></div>',
-                    pixelOffset: new google.maps.Size(-100 * index, 50 * index)
-                });
-            }
-        }
-    console.log(window_open_array);
+    var infoWindow;
+    var flag = false;
+    if(same == false){
+        infoWindow = new google.maps.InfoWindow({
+          content:　name + '<div id="infodiv' + index + '"></div>'
+        });
+    } else {
+        infoWindow = new google.maps.InfoWindow({
+            content:　name + '<div id="infodiv' + index + '"></div>',
+            pixelOffset: new google.maps.Size(-100 * index, 50 * index)
+        });
+    }
     infoWindow.addListener('domready', function () {
-        if(window_open_array[index] == 1){
-          RADAR_CHART.radarChart(index, blankScores);
+        if(flag == false){
+            RADAR_CHART.radarChart(index, blankScores);
+            flag = true;
         }
     });
-    infoWindow.open(map, marker)
+    if(window_open_array[index] == 1){
+        infoWindow.open(map, marker)
+    }
     infoWindow.addListener('closeclick' , function(){
         window_open_array[index] = 0;
         infoWindow.close();
-        console.log(window_open_array);
     });
         
     marker.addListener('click', function(){
-        infoWindow.open(map, marker)
+        console.log("click");
+            infoWindow.open(map, marker);
+            window_open_array[index] = 1;
     })
 };
 
